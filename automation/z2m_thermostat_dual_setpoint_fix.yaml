@@ -1,0 +1,50 @@
+blueprint:
+  name: Zigbee2mqtt Dual Setpoint Fix
+  description: Helps fix issues where a high and low setpoint are required for some
+    thermostats in Zigbee2MQTT.
+  domain: automation
+  source_url: https://github.com/seanharsh/Zigbee2Mqtt-Dual-SetPoint-Fix/blob/main/z2m_thermostat_dual_setpoint_fix.yaml
+  input:
+    thermostat_entity:
+      name: Thermostat
+      selector:
+        entity:
+          domain: climate
+          integration: mqtt
+          multiple: false
+    fahrenheit:
+      name: Convert to Fahrenheit
+      description: Needed if your thermostat is set to Fahrenheit
+      selector:
+        boolean: {}
+mode: single
+trigger:
+- platform: event
+  event_type: call_service
+  event_data:
+    domain: climate
+    service: set_temperature
+action:
+- alias: Set Thermostat
+  variables:
+    thermostat_entity: !input thermostat_entity
+    fahrenheit: !input fahrenheit
+- alias: Set Variables
+  variables:
+    set_temp: '{{ trigger.event.data.service_data.temperature }}'
+    target_temp_in_f: "{%- set target_in_c = \n  set_temp -%}\n{%- if fahrenheit -%}
+      {{ (target_in_c * (9.0/5.0)) + 32 | round(0) }} {%- else -%} {{ target_in_c
+      }} {%- endif -%}"
+    mode: '{{- states(thermostat_entity) -}}'
+- if:
+  - condition: template
+    value_template: '{{ mode != ''off'' }}'
+  then:
+  - service: climate.set_temperature
+    data:
+      target_temp_high: '{{ target_temp_in_f if ''cool'' in mode else state_attr(thermostat_entity,''target_temp_high'')
+        }}'
+      target_temp_low: '{{ target_temp_in_f if ''heat'' in mode else state_attr(thermostat_entity,''target_temp_low'')
+        }}'
+    target:
+      entity_id: !input thermostat_entity
