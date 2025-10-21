@@ -1,6 +1,6 @@
 blueprint:
   name: Sunrise Light Simulator
-  description: Gradually brighten lights and change color to simulate a sunrise over a specified duration
+  description: Gradually brighten lights and change color to simulate a sunrise over a specified duration. Specify by Light entity, Area, or Label.
   domain: automation
   input:
     target_lights:
@@ -33,6 +33,18 @@ blueprint:
           max: 100
           step: 1
           unit_of_measurement: "%"
+    pre_sunrise_actions:
+      name: Pre-Sunrise Actions (Optional)
+      description: Actions to run before the sunrise simulation starts
+      default: []
+      selector:
+        action: {}
+    post_sunrise_actions:
+      name: Post-Sunrise Actions (Optional)
+      description: Actions to run after the sunrise simulation completes
+      default: []
+      selector:
+        action: {}
 
 trigger:
   - platform: time
@@ -41,6 +53,8 @@ trigger:
 condition: []
 
 action:
+  - choose: []
+    default: !input pre_sunrise_actions
   - service: light.turn_on
     target: !input target_lights
     data:
@@ -86,6 +100,8 @@ action:
       brightness_pct: "{{ max_brightness }}"
       kelvin: 5500
       transition: "{{ (duration * 60 * 0.222) | int }}"
+  - choose: []
+    default: !input post_sunrise_actions
 
 mode: single
 
