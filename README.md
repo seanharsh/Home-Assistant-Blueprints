@@ -72,7 +72,7 @@ Each stage uses smooth transitions to create a natural, gradual effect.
 
 ### Installation
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FYOUR_USERNAME%2FYOUR_REPO%2Fblob%2Fmain%2Fsunrise_light_simulator.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fraw.githubusercontent.com%2Fseanharsh%2FHome-Assistant-Blueprints%2Fmain%2Fautomation%2Fsunrise_light_simulator.yaml)
 
 ### Option 2: Manual Installation
 1. Copy the blueprint YAML code
@@ -96,7 +96,7 @@ Sets a target temp for high and low values.
 
 ### Installation
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FYOUR_USERNAME%2FYOUR_REPO%2Fblob%2Fmain%2Fsunrise_light_simulator.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fraw.githubusercontent.com%2Fseanharsh%2FHome-Assistant-Blueprints%2Fmain%2Fautomation%2Fz2m_thermostat_dual_setpoint_fix.yaml)
 
 ### Option 2: Manual Installation
 1. Copy the blueprint YAML code
