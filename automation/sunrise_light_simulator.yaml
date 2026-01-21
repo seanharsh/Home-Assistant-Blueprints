@@ -72,6 +72,17 @@ variables:
   total_steps: "{{ (duration * 60 / step_interval) | int }}"
   start_kelvin: 2000
   end_kelvin: 5500
+  target_lights: !input target_lights
+  monitor_entity: >
+    {% if target_lights.entity_id is defined %}
+      {% if target_lights.entity_id is string %}
+        {{ target_lights.entity_id }}
+      {% else %}
+        {{ target_lights.entity_id[0] }}
+      {% endif %}
+    {% else %}
+      none
+    {% endif %}
 
 action:
   - choose: []
@@ -88,7 +99,11 @@ action:
       seconds: 2
 
   - repeat:
-      count: "{{ total_steps }}"
+      while:
+        - condition: template
+          value_template: "{{ repeat.index <= total_steps }}"
+        - condition: template
+          value_template: "{{ monitor_entity == 'none' or is_state(monitor_entity, 'on') }}"
       sequence:
         - action: light.turn_on
           target: !input target_lights
@@ -101,12 +116,18 @@ action:
         - delay:
             seconds: "{{ step_interval }}"
 
+  - condition: template
+    value_template: "{{ monitor_entity == 'none' or is_state(monitor_entity, 'on') }}"
+
   - action: light.turn_on
     target: !input target_lights
     data:
       brightness_pct: "{{ max_brightness }}"
       color_temp_kelvin: "{{ end_kelvin }}"
     continue_on_error: true
+
+  - condition: template
+    value_template: "{{ monitor_entity == 'none' or is_state(monitor_entity, 'on') }}"
 
   - choose: []
     default: !input post_sunrise_actions
