@@ -1,6 +1,9 @@
 blueprint:
   name: Sunrise Light Simulator
-  description: Gradually brighten lights and change color to simulate a sunrise over a specified duration. Specify by Light entity, Area, or Label.
+  description: >
+    Gradually brighten lights and change color to simulate a natural sunrise.
+    Uses configurable step intervals (default 30 sec) with smooth transitions
+    and a non-linear curve that mimics real sunrise progression.
   domain: automation
   input:
     target_lights:
@@ -19,7 +22,7 @@ blueprint:
       default: 45
       selector:
         number:
-          min: 10
+          min: 5
           max: 120
           step: 5
           unit_of_measurement: minutes
@@ -45,6 +48,16 @@ blueprint:
       default: []
       selector:
         action: {}
+    step_interval:
+      name: Step Interval (seconds)
+      description: Time between brightness changes. Lower = smoother but more service calls. Try 10 for bulbs that ignore transitions.
+      default: 30
+      selector:
+        number:
+          min: 5
+          max: 60
+          step: 5
+          unit_of_measurement: seconds
 
 trigger:
   - platform: time
@@ -52,59 +65,50 @@ trigger:
 
 condition: []
 
+variables:
+  duration: !input duration
+  max_brightness: !input max_brightness
+  step_interval: !input step_interval
+  total_steps: "{{ (duration * 60 / step_interval) | int }}"
+  start_kelvin: 2000
+  end_kelvin: 5500
+
 action:
   - choose: []
     default: !input pre_sunrise_actions
-  - service: light.turn_on
+
+  - action: light.turn_on
     target: !input target_lights
     data:
       brightness_pct: 1
-      kelvin: 2000
+      color_temp_kelvin: "{{ start_kelvin }}"
+    continue_on_error: true
+
   - delay:
-      seconds: 5
-  - service: light.turn_on
-    target: !input target_lights
-    data:
-      brightness_pct: "{{ (max_brightness * 0.10) | int }}"
-      kelvin: 2200
-      transition: "{{ (duration * 60 * 0.185) | int }}"
-  - delay:
-      seconds: "{{ (duration * 60 * 0.185) | int }}"
-  - service: light.turn_on
-    target: !input target_lights
-    data:
-      brightness_pct: "{{ (max_brightness * 0.29) | int }}"
-      kelvin: 2700
-      transition: "{{ (duration * 60 * 0.222) | int }}"
-  - delay:
-      seconds: "{{ (duration * 60 * 0.222) | int }}"
-  - service: light.turn_on
-    target: !input target_lights
-    data:
-      brightness_pct: "{{ (max_brightness * 0.59) | int }}"
-      kelvin: 3500
-      transition: "{{ (duration * 60 * 0.222) | int }}"
-  - delay:
-      seconds: "{{ (duration * 60 * 0.222) | int }}"
-  - service: light.turn_on
-    target: !input target_lights
-    data:
-      brightness_pct: "{{ (max_brightness * 0.86) | int }}"
-      kelvin: 4500
-      transition: "{{ (duration * 60 * 0.222) | int }}"
-  - delay:
-      seconds: "{{ (duration * 60 * 0.222) | int }}"
-  - service: light.turn_on
+      seconds: 2
+
+  - repeat:
+      count: "{{ total_steps }}"
+      sequence:
+        - action: light.turn_on
+          target: !input target_lights
+          data:
+            brightness_pct: "{{ (1 + (max_brightness - 1) * ((repeat.index / total_steps) ** 1.3)) | int }}"
+            color_temp_kelvin: "{{ (2000 + 3500 * (1 - ((1 - repeat.index / total_steps) ** 1.5))) | int }}"
+            transition: "{{ step_interval }}"
+          continue_on_error: true
+
+        - delay:
+            seconds: "{{ step_interval }}"
+
+  - action: light.turn_on
     target: !input target_lights
     data:
       brightness_pct: "{{ max_brightness }}"
-      kelvin: 5500
-      transition: "{{ (duration * 60 * 0.222) | int }}"
+      color_temp_kelvin: "{{ end_kelvin }}"
+    continue_on_error: true
+
   - choose: []
     default: !input post_sunrise_actions
 
 mode: single
-
-variables:
-  duration: !input duration
-  max_brightness: !input max_brightness
