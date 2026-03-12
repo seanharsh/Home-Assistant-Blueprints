@@ -33,7 +33,7 @@ action:
   variables:
     set_temp: '{{ trigger.event.data.service_data.temperature }}'
     target_temp_in_f: "{%- set target_in_c = \n  set_temp -%}\n{%- if fahrenheit -%}
-      {{ (target_in_c * (9.0/5.0)) + 32 | round(0) }} {%- else -%} {{ target_in_c
+      {{ ((target_in_c * (9.0/5.0)) + 32) | round(0) }} {%- else -%} {{ target_in_c
       }} {%- endif -%}"
     mode: '{{- states(thermostat_entity) -}}'
 - if:
