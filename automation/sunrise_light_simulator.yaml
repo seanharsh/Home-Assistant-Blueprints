@@ -71,18 +71,43 @@ blueprint:
           max: 100
           step: 1
           unit_of_measurement: "%"
+    days_of_week:
+      name: Days of Week (Optional)
+      description: Select which days to run the sunrise simulation. Leave empty to run every day.
+      default: []
+      selector:
+        select:
+          options:
+            - label: Monday
+              value: "mon"
+            - label: Tuesday
+              value: "tue"
+            - label: Wednesday
+              value: "wed"
+            - label: Thursday
+              value: "thu"
+            - label: Friday
+              value: "fri"
+            - label: Saturday
+              value: "sat"
+            - label: Sunday
+              value: "sun"
+          multiple: true
 
 trigger:
   - platform: time
     at: !input start_time
 
-condition: []
+condition:
+  - condition: template
+    value_template: "{{ days_of_week | length == 0 or now().strftime('%a').lower()[:3] in days_of_week }}"
 
 variables:
   duration: !input duration
   max_brightness: !input max_brightness
   step_interval: !input step_interval
   startup_brightness: !input startup_brightness
+  days_of_week: !input days_of_week
   total_steps: "{{ (duration * 60 / step_interval) | int }}"
   start_kelvin: 2000
   end_kelvin: 5500
