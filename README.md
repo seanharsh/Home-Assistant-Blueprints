@@ -8,9 +8,12 @@ A blueprint that gradually brightens your lights and changes their color tempera
 
 - 🌅 **Natural sunrise simulation** - Gradually transitions from deep red/orange to bright daylight
 - 🎯 **Flexible targeting** - Select individual lights, multiple entities, entire areas, devices, or labels
-- ⏱️ **Customizable duration** - Set sunrise length from 10 to 120 minutes
+- ⏱️ **Customizable duration** - Set sunrise length from 5 to 120 minutes
 - 💡 **Adjustable brightness** - Set maximum brightness as a percentage (1-100%)
-- 🎨 **Color temperature progression** - Smoothly transitions through 2000K → 2200K → 2700K → 3500K → 4500K → 5500K
+- 🎨 **Color temperature progression** - Smoothly transitions from 2000K (warm) to 5500K (cool daylight)
+- 📅 **Day-of-week filtering** - Run only on specific days (e.g., weekdays only, skip weekends)
+- ⚙️ **Device-specific tuning** - Configure step interval for smooth transitions based on your light type
+- 🔧 **Custom actions** - Add pre-sunrise setup actions or post-sunrise cleanup actions
 
 ### Configuration
 
@@ -20,8 +23,13 @@ When creating an automation from this blueprint, you'll configure:
 |-----------|----------|---------|-------------|
 | **Lights** | Yes | - | Select lights by entity, area, device, or label |
 | **Start Time** | Yes | - | Time to start the sunrise (e.g., 06:45:00) |
-| **Duration** | No | 45 minutes | How long the sunrise should last (10-120 minutes) |
+| **Duration** | No | 45 minutes | How long the sunrise should last (5-120 minutes) |
 | **Maximum Brightness** | No | 100% | Maximum brightness level at the end (1-100%) |
+| **Startup Brightness** | No | 1% | Initial brightness when simulation starts (1-100%). Increase to 5-10% if lights flicker at startup |
+| **Step Interval** | No | 30 seconds | Time between brightness updates (5-60 seconds). Adjust for your light type: LIFX 5-10s, Hue 10-15s, Govee 15-30s |
+| **Days of Week** | No | Every day | Select which days to run (leave empty for daily) |
+| **Pre-Sunrise Actions** | No | - | Actions to run before the sunrise simulation starts |
+| **Post-Sunrise Actions** | No | - | Actions to run after the sunrise simulation completes |
 
 ### Usage Example
 
@@ -38,15 +46,16 @@ Your lights will now gradually wake you up with a natural sunrise simulation eve
 
 ### How It Works
 
-The blueprint creates a 5-stage sunrise progression:
+The blueprint uses a smooth, non-linear curve to simulate a natural sunrise:
 
-1. **Stage 1** (0-11%): Deep red/orange (2000K) - Very dim
-2. **Stage 2** (11-33%): Warm orange (2200K) - Gentle glow
-3. **Stage 3** (33-55%): Warm yellow (2700K) - Soft light
-4. **Stage 4** (55-77%): Neutral white (3500K) - Increasing brightness
-5. **Stage 5** (77-100%): Cool daylight (4500K → 5500K) - Full brightness
+- **Color temperature**: Progresses from warm (2000K) to cool daylight (5500K)
+- **Brightness curve**: Uses a non-linear progression (power of 1.3) for natural-feeling transitions
+- **Smooth transitions**: Updates brightness at configurable intervals (default 30 seconds)
+- **Hardware aware**: Adjustable step interval and startup brightness for different light types
+- **Smart light monitoring**: Stops if the light is turned off during the simulation
+- **Flexible scheduling**: Run daily or only on specific days of the week
 
-Each stage uses smooth transitions to create a natural, gradual effect.
+The algorithm starts at your configured startup brightness and smoothly increases to maximum brightness over the duration, while simultaneously shifting color temperature from warm to cool.
 
 ### Requirements
 
@@ -69,6 +78,16 @@ Each stage uses smooth transitions to create a natural, gradual effect.
 **Transitions aren't smooth:**
 - Some lights have limitations on transition duration
 - Try adjusting the duration to be longer
+- Adjust **Step Interval** based on your light type (see configuration table)
+
+**Lights flicker or don't respond at startup:**
+- Increase **Startup Brightness** to 5-10% instead of the default 1%
+- This helps with lights like Govee that have issues with very low commands
+
+**Automation doesn't run on certain days:**
+- Check that **Days of Week** is configured correctly
+- Leave it empty to run every day
+- Make sure you've selected the correct days (Monday-Sunday)
 
 ### Installation
 
