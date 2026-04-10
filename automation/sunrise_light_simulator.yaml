@@ -50,7 +50,10 @@ blueprint:
         action: {}
     step_interval:
       name: Step Interval (seconds)
-      description: Time between brightness changes. Lower = smoother but more service calls. Try 10 for bulbs that ignore transitions.
+      description: >
+        Time between brightness changes. Lower values = smoother transitions but more service calls; higher values = more compatible with all lights.
+        Device recommendations: LIFX 5-10s, Philips Hue 10-15s, Govee/MQTT 15-30s, Generic dimmers 10-20s.
+        If you see jarring transitions, try increasing this value.
       default: 30
       selector:
         number:
