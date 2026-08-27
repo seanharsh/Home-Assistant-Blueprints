@@ -26,51 +26,6 @@ blueprint:
           max: 120
           step: 5
           unit_of_measurement: minutes
-    max_brightness:
-      name: Maximum Brightness
-      description: The maximum brightness level to reach at the end of the sunrise
-      default: 100
-      selector:
-        number:
-          min: 1
-          max: 100
-          step: 1
-          unit_of_measurement: "%"
-    pre_sunrise_actions:
-      name: Pre-Sunrise Actions (Optional)
-      description: Actions to run before the sunrise simulation starts
-      default: []
-      selector:
-        action: {}
-    post_sunrise_actions:
-      name: Post-Sunrise Actions (Optional)
-      description: Actions to run after the sunrise simulation completes
-      default: []
-      selector:
-        action: {}
-    step_interval:
-      name: Step Interval (seconds)
-      description: >
-        Time between brightness changes. Lower values = smoother transitions but more service calls; higher values = more compatible with all lights.
-        Device recommendations: LIFX 5-10s, Philips Hue 10-15s, Govee/MQTT 15-30s, Generic dimmers 10-20s.
-        If you see jarring transitions, try increasing this value.
-      default: 30
-      selector:
-        number:
-          min: 5
-          max: 60
-          step: 5
-          unit_of_measurement: seconds
-    startup_brightness:
-      name: Startup Brightness (%)
-      description: Initial brightness when the sunrise simulation starts. Some lights (especially Govee) have issues with very low startup commands. Try 5-10% instead of 1% if your light flickers or doesn't respond at startup.
-      default: 1
-      selector:
-        number:
-          min: 1
-          max: 100
-          step: 1
-          unit_of_measurement: "%"
     days_of_week:
       name: Days of Week (Optional)
       description: Select which days to run the sunrise simulation. Leave empty to run every day.
@@ -93,6 +48,26 @@ blueprint:
             - label: Sunday
               value: "sun"
           multiple: true
+    max_brightness:
+      name: Maximum Brightness
+      description: The maximum brightness level to reach at the end of the sunrise
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+          unit_of_measurement: "%"
+    startup_brightness:
+      name: Startup Brightness (%)
+      description: Initial brightness when the sunrise simulation starts. Some lights (especially Govee) have issues with very low startup commands. Try 5-10% instead of 1% if your light flickers or doesn't respond at startup.
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+          unit_of_measurement: "%"
     start_color_temp:
       name: Starting Color Temperature
       description: The warm color to start the sunrise with. Presets are suggested values; use custom kelvin for fine-tuning (1800-6500K).
@@ -127,6 +102,31 @@ blueprint:
             - label: "Bright Cool Daylight (6500K)"
               value: "6500"
           custom_value: true
+    step_interval:
+      name: Step Interval (seconds)
+      description: >
+        Time between brightness changes. Lower values = smoother transitions but more service calls; higher values = more compatible with all lights.
+        Device recommendations: LIFX 5-10s, Philips Hue 10-15s, Govee/MQTT 15-30s, Generic dimmers 10-20s.
+        If you see jarring transitions, try increasing this value.
+      default: 30
+      selector:
+        number:
+          min: 5
+          max: 60
+          step: 5
+          unit_of_measurement: seconds
+    pre_sunrise_actions:
+      name: Pre-Sunrise Actions (Optional)
+      description: Actions to run before the sunrise simulation starts
+      default: []
+      selector:
+        action: {}
+    post_sunrise_actions:
+      name: Post-Sunrise Actions (Optional)
+      description: Actions to run after the sunrise simulation completes
+      default: []
+      selector:
+        action: {}
 
 trigger:
   - platform: time
