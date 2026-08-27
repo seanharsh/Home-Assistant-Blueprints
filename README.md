@@ -1,19 +1,22 @@
 # Blueprints for Home Assistant
 
+Home Assistant automation blueprints created and shared with the worls, by me ;)
+
 ## Sunrise Light Simulator
 
 A blueprint that gradually brightens your lights and changes their color temperature to simulate a natural sunrise over a customizable duration.
 
 ### Features
 
-- 🌅 **Natural sunrise simulation** - Gradually transitions from deep red/orange to bright daylight
+- 🌅 **Natural sunrise simulation** - Gradually transitions from warm/orange to bright daylight using non-linear curves
 - 🎯 **Flexible targeting** - Select individual lights, multiple entities, entire areas, devices, or labels
 - ⏱️ **Customizable duration** - Set sunrise length from 5 to 120 minutes
-- 💡 **Adjustable brightness** - Set maximum brightness as a percentage (1-100%)
-- 🎨 **Color temperature progression** - Smoothly transitions from 2000K (warm) to 5500K (cool daylight)
+- 💡 **Adjustable brightness** - Set startup and maximum brightness (1-100%)
+- 🎨 **Customizable color temperature** - Choose from presets or set custom start/end Kelvin values (1800-6500K)
 - 📅 **Day-of-week filtering** - Run only on specific days (e.g., weekdays only, skip weekends)
-- ⚙️ **Device-specific tuning** - Configure step interval for smooth transitions based on your light type
+- ⚙️ **Device-specific tuning** - Configure step interval for smooth transitions based on your light type (LIFX, Hue, Govee, etc.)
 - 🔧 **Custom actions** - Add pre-sunrise setup actions or post-sunrise cleanup actions
+- ⏸️ **Smart monitoring** - Stops automatically if you manually turn off the light during simulation
 
 ### Configuration
 
