@@ -115,6 +115,18 @@ blueprint:
           max: 60
           step: 5
           unit_of_measurement: seconds
+    presence_entity:
+      name: Presence Check Entity (Optional)
+      description: Optional entity (e.g. a person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run.
+      default: ""
+      selector:
+        entity: {}
+    presence_state:
+      name: Required Presence State
+      description: The state the presence entity must be in for the sunrise to trigger (e.g. "home", "on"). Only used if Presence Check Entity is set.
+      default: "home"
+      selector:
+        text: {}
     pre_sunrise_actions:
       name: Pre-Sunrise Actions (Optional)
       description: Actions to run before the sunrise simulation starts
@@ -135,6 +147,8 @@ trigger:
 condition:
   - condition: template
     value_template: "{{ days_of_week | length == 0 or now().strftime('%a').lower()[:3] in days_of_week }}"
+  - condition: template
+    value_template: "{{ presence_entity in ('', none) or is_state(presence_entity, presence_state) }}"
 
 variables:
   duration: !input duration
@@ -144,6 +158,8 @@ variables:
   days_of_week: !input days_of_week
   start_color_temp: !input start_color_temp
   end_color_temp: !input end_color_temp
+  presence_entity: !input presence_entity
+  presence_state: !input presence_state
   total_steps: "{{ (duration * 60 / step_interval) | int }}"
   start_kelvin: "{{ start_color_temp | int(2000) }}"
   end_kelvin: "{{ end_color_temp | int(5500) }}"
