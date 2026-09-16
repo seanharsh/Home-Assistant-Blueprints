@@ -115,18 +115,30 @@ blueprint:
           max: 60
           step: 5
           unit_of_measurement: seconds
-    presence_entity:
-      name: Presence Check Entity (Optional)
-      description: Optional entity (e.g. a person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run.
-      default: ""
+    presence_entities:
+      name: Presence Check Entities (Optional)
+      description: Optional entity or entities (e.g. person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run.
+      default: []
       selector:
-        entity: {}
+        entity:
+          multiple: true
     presence_state:
       name: Required Presence State
-      description: The state the presence entity must be in for the sunrise to trigger (e.g. "home", "on"). Only used if Presence Check Entity is set.
+      description: The state the presence entities must be in for the sunrise to trigger (e.g. "home", "on"). Only used if Presence Check Entities is set.
       default: "home"
       selector:
         text: {}
+    presence_logic:
+      name: Presence Match Logic
+      description: When multiple presence entities are selected, require ANY of them (e.g. someone is home) or ALL of them (e.g. everyone is home) to be in the required state.
+      default: "any"
+      selector:
+        select:
+          options:
+            - label: "Any - at least one entity matches"
+              value: "any"
+            - label: "All - every entity matches"
+              value: "all"
     pre_sunrise_actions:
       name: Pre-Sunrise Actions (Optional)
       description: Actions to run before the sunrise simulation starts
@@ -148,7 +160,10 @@ condition:
   - condition: template
     value_template: "{{ days_of_week | length == 0 or now().strftime('%a').lower()[:3] in days_of_week }}"
   - condition: template
-    value_template: "{{ presence_entity in ('', none) or is_state(presence_entity, presence_state) }}"
+    value_template: >
+      {{ presence_entities | length == 0 or
+         (presence_logic == 'all' and presence_entities | reject('is_state', presence_state) | list | length == 0) or
+         (presence_logic != 'all' and presence_entities | select('is_state', presence_state) | list | length > 0) }}
 
 variables:
   duration: !input duration
@@ -158,8 +173,9 @@ variables:
   days_of_week: !input days_of_week
   start_color_temp: !input start_color_temp
   end_color_temp: !input end_color_temp
-  presence_entity: !input presence_entity
+  presence_entities: !input presence_entities
   presence_state: !input presence_state
+  presence_logic: !input presence_logic
   total_steps: "{{ (duration * 60 / step_interval) | int }}"
   start_kelvin: "{{ start_color_temp | int(2000) }}"
   end_kelvin: "{{ end_color_temp | int(5500) }}"
