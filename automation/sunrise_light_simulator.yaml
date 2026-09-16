@@ -127,6 +127,19 @@ blueprint:
       default: []
       selector:
         action: {}
+    presence_entities:
+      name: Presence Entities (Optional)
+      description: >
+        Only run the sunrise simulation if at least one of these is home.
+        Select one or more person or device tracker entities. Leave empty
+        to always run regardless of presence.
+      default: []
+      selector:
+        entity:
+          domain:
+            - person
+            - device_tracker
+          multiple: true
 
 trigger:
   - platform: time
@@ -135,6 +148,9 @@ trigger:
 condition:
   - condition: template
     value_template: "{{ days_of_week | length == 0 or now().strftime('%a').lower()[:3] in days_of_week }}"
+  - condition: template
+    value_template: >
+      {{ presence_entities | length == 0 or presence_entities | select('is_state', 'home') | list | length > 0 }}
 
 variables:
   duration: !input duration
@@ -142,6 +158,7 @@ variables:
   step_interval: !input step_interval
   startup_brightness: !input startup_brightness
   days_of_week: !input days_of_week
+  presence_entities: !input presence_entities
   start_color_temp: !input start_color_temp
   end_color_temp: !input end_color_temp
   total_steps: "{{ (duration * 60 / step_interval) | int }}"
