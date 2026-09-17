@@ -153,7 +153,7 @@ blueprint:
         action: {}
     auto_off_minutes:
       name: Auto-Off Timeout (Optional)
-      description: Turn the light off automatically this many minutes after the sunrise completes. Leave at 0 to disable.
+      description: Turn the light(s) off automatically this many minutes after the sunrise completes. Leave at 0 to disable.
       default: 0
       selector:
         number:
