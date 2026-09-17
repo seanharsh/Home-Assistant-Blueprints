@@ -13,7 +13,7 @@ All notable changes to this project's blueprints.
 
 ---
 
-### [v1.6.0] - Unreleased
+### [v1.6.0] - 2026-08-27
 
 **Added:**
 - Customizable start and end color temperature (Kelvin) with presets (1800-6500K)
