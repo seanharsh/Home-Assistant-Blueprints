@@ -10,6 +10,7 @@ All notable changes to this project's blueprints.
 - Optional presence check (`presence_entities`, `presence_state`) - gate the sunrise on one or more entities (e.g. a person) being in a required state
 - Presence match logic (`presence_logic`) - require ANY or ALL selected presence entities to match
 - Already-on awareness - if the light is already on when triggered, skips the forced startup brightness/color snap and ramps from its current brightness instead
+- Auto-off timeout (`auto_off_minutes`) - optionally turn the light(s) off automatically a set number of minutes after the sunrise and any post-sunrise actions complete
 
 ---
 
