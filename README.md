@@ -19,6 +19,7 @@ A blueprint that gradually brightens your lights and changes their color tempera
 - ⏸️ **Smart monitoring** - Stops automatically if you manually turn off the light during simulation
 - 🏠 **Presence-aware** - Optionally require one or more entities (e.g. a person) to be in a given state before the sunrise runs
 - 🔆 **Already-on aware** - If the light is already on when triggered, ramps from its current brightness instead of snapping back to the startup brightness
+- 🌙 **Auto-off timeout** - Optionally turn the light(s) off automatically a set number of minutes after the sunrise (and any post-sunrise actions) complete
 
 ### Configuration
 
@@ -40,6 +41,7 @@ When creating an automation from this blueprint, you'll configure:
 | **Presence Match Logic** | No | Any | Whether ANY or ALL of the selected presence entities must match the required state |
 | **Pre-Sunrise Actions** | No | - | Actions to run before the sunrise simulation starts |
 | **Post-Sunrise Actions** | No | - | Actions to run after the sunrise simulation completes |
+| **Auto-Off Timeout** | No | 0 (disabled) | Turn the light(s) off automatically this many minutes after the sunrise completes (0-240 minutes) |
 
 ### Usage Example
 
@@ -66,6 +68,7 @@ The blueprint uses a smooth, non-linear curve to simulate a natural sunrise:
 - **Flexible scheduling**: Run daily or only on specific days of the week
 - **Presence gating**: Optionally skip the whole automation unless presence entities match a required state (any or all)
 - **Already-on handling**: If the light is already on, skips the forced startup snap and ramps brightness from its current level instead
+- **Auto-off**: If set above 0, turns the light(s) off after the configured number of minutes once the sunrise (and post-sunrise actions) finish
 
 The algorithm starts at your configured startup brightness (or the light's current brightness if it's already on) and smoothly increases to maximum brightness over the duration, while simultaneously shifting color temperature from warm to cool.
 
@@ -105,6 +108,10 @@ The algorithm starts at your configured startup brightness (or the light's curre
 - Verify **Required Presence State** matches the entity's actual state string (e.g. "home" for a person, "on" for a binary_sensor)
 - With multiple entities, check **Presence Match Logic** - "All" requires every entity to match, "Any" only needs one
 - Leave **Presence Check Entities** empty to disable the presence check entirely
+
+**Light(s) don't turn off automatically:**
+- Check that **Auto-Off Timeout** is set above 0 (0 disables it)
+- The timeout starts counting after the sunrise *and* any **Post-Sunrise Actions** finish, not right at max brightness
 
 ### Installation
 
