@@ -17,6 +17,8 @@ A blueprint that gradually brightens your lights and changes their color tempera
 - ⚙️ **Device-specific tuning** - Configure step interval for smooth transitions based on your light type (LIFX, Hue, Govee, etc.)
 - 🔧 **Custom actions** - Add pre-sunrise setup actions or post-sunrise cleanup actions
 - ⏸️ **Smart monitoring** - Stops automatically if you manually turn off the light during simulation
+- 🏠 **Presence-aware** - Optionally require one or more entities (e.g. a person) to be in a given state before the sunrise runs
+- 🔆 **Already-on aware** - If the light is already on when triggered, ramps from its current brightness instead of snapping back to the startup brightness
 
 ### Configuration
 
@@ -29,8 +31,13 @@ When creating an automation from this blueprint, you'll configure:
 | **Duration** | No | 45 minutes | How long the sunrise should last (5-120 minutes) |
 | **Maximum Brightness** | No | 100% | Maximum brightness level at the end (1-100%) |
 | **Startup Brightness** | No | 1% | Initial brightness when simulation starts (1-100%). Increase to 5-10% if lights flicker at startup |
+| **Starting Color Temperature** | No | 2000K | Warm color temperature to start the sunrise with (preset or custom 1800-6500K) |
+| **Ending Color Temperature** | No | 5500K | Cool daylight color temperature to end the sunrise with (preset or custom 1800-6500K) |
 | **Step Interval** | No | 30 seconds | Time between brightness updates (5-60 seconds). Adjust for your light type: LIFX 5-10s, Hue 10-15s, Govee 15-30s |
 | **Days of Week** | No | Every day | Select which days to run (leave empty for daily) |
+| **Presence Check Entities** | No | - | Entity or entities (e.g. a person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run |
+| **Required Presence State** | No | home | The state the presence entities must be in (e.g. "home", "on"). Only used if Presence Check Entities is set |
+| **Presence Match Logic** | No | Any | Whether ANY or ALL of the selected presence entities must match the required state |
 | **Pre-Sunrise Actions** | No | - | Actions to run before the sunrise simulation starts |
 | **Post-Sunrise Actions** | No | - | Actions to run after the sunrise simulation completes |
 
@@ -57,12 +64,14 @@ The blueprint uses a smooth, non-linear curve to simulate a natural sunrise:
 - **Hardware aware**: Adjustable step interval and startup brightness for different light types
 - **Smart light monitoring**: Stops if the light is turned off during the simulation
 - **Flexible scheduling**: Run daily or only on specific days of the week
+- **Presence gating**: Optionally skip the whole automation unless presence entities match a required state (any or all)
+- **Already-on handling**: If the light is already on, skips the forced startup snap and ramps brightness from its current level instead
 
-The algorithm starts at your configured startup brightness and smoothly increases to maximum brightness over the duration, while simultaneously shifting color temperature from warm to cool.
+The algorithm starts at your configured startup brightness (or the light's current brightness if it's already on) and smoothly increases to maximum brightness over the duration, while simultaneously shifting color temperature from warm to cool.
 
 ### Requirements
 
-- Home Assistant 2021.3 or newer
+- Home Assistant 2023.1 or newer (uses the `target`, `select` with custom values, and `action` selectors, which post-date 2021.3)
 - Lights that support:
   - Brightness control
   - Color temperature (Kelvin) control
@@ -91,6 +100,11 @@ The algorithm starts at your configured startup brightness and smoothly increase
 - Check that **Days of Week** is configured correctly
 - Leave it empty to run every day
 - Make sure you've selected the correct days (Monday-Sunday)
+
+**Automation never triggers when Presence Check Entities is set:**
+- Verify **Required Presence State** matches the entity's actual state string (e.g. "home" for a person, "on" for a binary_sensor)
+- With multiple entities, check **Presence Match Logic** - "All" requires every entity to match, "Any" only needs one
+- Leave **Presence Check Entities** empty to disable the presence check entirely
 
 ### Installation
 
