@@ -48,20 +48,44 @@ blueprint:
             - label: Sunday
               value: "sun"
           multiple: true
-    max_brightness:
-      name: Maximum Brightness
-      description: The maximum brightness level to reach at the end of the sunrise
-      default: 100
+    presence_entities:
+      name: Presence Check Entities (Optional)
+      description: Optional entity or entities (e.g. person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run.
+      default: []
+      selector:
+        entity:
+          multiple: true
+    presence_state:
+      name: Required Presence State
+      description: The state the presence entities must be in for the sunrise to trigger (e.g. "home", "on"). Only used if Presence Check Entities is set.
+      default: "home"
+      selector:
+        text: {}
+    presence_logic:
+      name: Presence Match Logic
+      description: When multiple presence entities are selected, require ANY of them (e.g. someone is home) or ALL of them (e.g. everyone is home) to be in the required state.
+      default: "any"
+      selector:
+        select:
+          options:
+            - label: "Any - at least one entity matches"
+              value: "any"
+            - label: "All - every entity matches"
+              value: "all"
+    startup_brightness:
+      name: Startup Brightness (%)
+      description: Initial brightness when the sunrise simulation starts. Some lights (especially Govee) have issues with very low startup commands. Try 5-10% instead of 1% if your light flickers or doesn't respond at startup.
+      default: 1
       selector:
         number:
           min: 1
           max: 100
           step: 1
           unit_of_measurement: "%"
-    startup_brightness:
-      name: Startup Brightness (%)
-      description: Initial brightness when the sunrise simulation starts. Some lights (especially Govee) have issues with very low startup commands. Try 5-10% instead of 1% if your light flickers or doesn't respond at startup.
-      default: 1
+    max_brightness:
+      name: Maximum Brightness
+      description: The maximum brightness level to reach at the end of the sunrise
+      default: 100
       selector:
         number:
           min: 1
@@ -115,30 +139,6 @@ blueprint:
           max: 60
           step: 5
           unit_of_measurement: seconds
-    presence_entities:
-      name: Presence Check Entities (Optional)
-      description: Optional entity or entities (e.g. person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run.
-      default: []
-      selector:
-        entity:
-          multiple: true
-    presence_state:
-      name: Required Presence State
-      description: The state the presence entities must be in for the sunrise to trigger (e.g. "home", "on"). Only used if Presence Check Entities is set.
-      default: "home"
-      selector:
-        text: {}
-    presence_logic:
-      name: Presence Match Logic
-      description: When multiple presence entities are selected, require ANY of them (e.g. someone is home) or ALL of them (e.g. everyone is home) to be in the required state.
-      default: "any"
-      selector:
-        select:
-          options:
-            - label: "Any - at least one entity matches"
-              value: "any"
-            - label: "All - every entity matches"
-              value: "all"
     pre_sunrise_actions:
       name: Pre-Sunrise Actions (Optional)
       description: Actions to run before the sunrise simulation starts
