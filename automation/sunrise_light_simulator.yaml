@@ -151,6 +151,16 @@ blueprint:
       default: []
       selector:
         action: {}
+    auto_off_minutes:
+      name: Auto-Off Timeout (Optional)
+      description: Turn the light off automatically this many minutes after the sunrise completes. Leave at 0 to disable.
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 240
+          step: 5
+          unit_of_measurement: minutes
 
 trigger:
   - platform: time
@@ -176,6 +186,7 @@ variables:
   presence_entities: !input presence_entities
   presence_state: !input presence_state
   presence_logic: !input presence_logic
+  auto_off_minutes: !input auto_off_minutes
   total_steps: "{{ (duration * 60 / step_interval) | int }}"
   start_kelvin: "{{ start_color_temp | int(2000) }}"
   end_kelvin: "{{ end_color_temp | int(5500) }}"
@@ -251,5 +262,14 @@ action:
 
   - choose: []
     default: !input post_sunrise_actions
+
+  - if:
+      - condition: template
+        value_template: "{{ auto_off_minutes | int(0) > 0 }}"
+    then:
+      - delay:
+          minutes: "{{ auto_off_minutes }}"
+      - action: light.turn_off
+        target: !input target_lights
 
 mode: single
