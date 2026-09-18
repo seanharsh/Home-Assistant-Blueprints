@@ -255,6 +255,7 @@ action:
     data:
       brightness_pct: "{{ max_brightness }}"
       color_temp_kelvin: "{{ end_kelvin }}"
+      transition: 2
     continue_on_error: true
 
   - condition: template
