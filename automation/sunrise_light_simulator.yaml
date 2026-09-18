@@ -204,7 +204,7 @@ variables:
   light_is_on: "{{ monitor_entity != 'none' and is_state(monitor_entity, 'on') }}"
   effective_start_brightness: >
     {% if light_is_on and state_attr(monitor_entity, 'brightness') %}
-      {{ (state_attr(monitor_entity, 'brightness') / 255 * 100) | round(0) }}
+      {{ [(state_attr(monitor_entity, 'brightness') / 255 * 100) | round(0), max_brightness] | min }}
     {% else %}
       {{ startup_brightness }}
     {% endif %}
