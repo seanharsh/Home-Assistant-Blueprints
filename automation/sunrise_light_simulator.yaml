@@ -272,5 +272,6 @@ action:
           minutes: "{{ auto_off_minutes }}"
       - action: light.turn_off
         target: !input target_lights
+        continue_on_error: true
 
 mode: single
