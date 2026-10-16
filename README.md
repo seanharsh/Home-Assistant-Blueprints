@@ -1,6 +1,6 @@
 # Blueprints for Home Assistant
 
-Home Assistant automation blueprints created and shared with the worls, by me ;)
+Home Assistant automation blueprints created and shared with the world, by me ;)
 
 ## Sunrise Light Simulator
 
@@ -15,10 +15,10 @@ A blueprint that gradually brightens your lights and changes their color tempera
 - 🎨 **Customizable color temperature** - Choose from presets or set custom start/end Kelvin values (1800-6500K)
 - 📅 **Day-of-week filtering** - Run only on specific days (e.g., weekdays only, skip weekends)
 - ⚙️ **Device-specific tuning** - Configure step interval for smooth transitions based on your light type (LIFX, Hue, Govee, etc.)
-- 🔧 **Custom actions** - Add pre-sunrise setup actions or post-sunrise cleanup actions
-- ⏸️ **Smart monitoring** - Stops automatically if you manually turn off the light during simulation
+- 🔧 **Custom actions** - Run any actions before or after the sunrise to involve other devices (blinds, speakers, thermostats, notifications)
+- ⏸️ **Smart monitoring** - Stops automatically if you manually turn off the light during simulation (when lights are selected by entity, see [Choosing How to Select Lights](#choosing-how-to-select-lights))
 - 🏠 **Presence-aware** - Optionally require one or more entities (e.g. a person) to be in a given state before the sunrise runs
-- 🔆 **Already-on aware** - If the light is already on when triggered, ramps from its current brightness instead of snapping back to the startup brightness
+- 🔆 **Already-on aware** - If the light is already on when triggered, ramps from its current brightness instead of snapping back to the startup brightness (when lights are selected by entity)
 - 🌙 **Auto-off timeout** - Optionally turn the light(s) off automatically a set number of minutes after the sunrise (and any post-sunrise actions) complete
 
 ### Configuration
@@ -27,7 +27,7 @@ When creating an automation from this blueprint, you'll configure:
 
 | Parameter | Required | Default | Description |
 |-----------|----------|---------|-------------|
-| **Lights** | Yes | - | Select lights by entity, area, device, or label |
+| **Lights** | Yes | - | Select lights by entity, area, device, or label. Pick individual light entities to get stop-on-manual-off and already-on detection (see [Choosing How to Select Lights](#choosing-how-to-select-lights)) |
 | **Start Time** | Yes | - | Time to start the sunrise (e.g., 06:45:00) |
 | **Duration** | No | 45 minutes | How long the sunrise should last (5-120 minutes) |
 | **Maximum Brightness** | No | 100% | Maximum brightness level at the end (1-100%) |
@@ -39,8 +39,8 @@ When creating an automation from this blueprint, you'll configure:
 | **Presence Check Entities** | No | - | Entity or entities (e.g. a person or binary_sensor) that must be in the required state for the sunrise to run. Leave empty to always run |
 | **Required Presence State** | No | home | The state the presence entities must be in (e.g. "home", "on"). Only used if Presence Check Entities is set |
 | **Presence Match Logic** | No | Any | Whether ANY or ALL of the selected presence entities must match the required state |
-| **Pre-Sunrise Actions** | No | - | Actions to run before the sunrise simulation starts |
-| **Post-Sunrise Actions** | No | - | Actions to run after the sunrise simulation completes |
+| **Pre-Sunrise Actions** | No | - | Actions to run before the sunrise simulation starts, e.g. start a nature sounds playlist or open the blinds |
+| **Post-Sunrise Actions** | No | - | Actions to run once the sunrise reaches full brightness, e.g. raise the thermostat or announce the weather. Skipped if the light is turned off before the sunrise finishes |
 | **Auto-Off Timeout** | No | 0 (disabled) | Turn the light(s) off automatically this many minutes after the sunrise completes (0-240 minutes) |
 
 ### Usage Example
@@ -56,6 +56,37 @@ When creating an automation from this blueprint, you'll configure:
 
 Your lights will now gradually wake you up with a natural sunrise simulation every morning!
 
+### Choosing How to Select Lights
+
+The blueprint can target lights by entity, area, device, or label, but two features only work when you pick individual light **entities**:
+
+| Behavior | Lights picked as entities | Area, device, or label only |
+|----------|---------------------------|-----------------------------|
+| Brightness and color ramp | Yes | Yes |
+| Stop if the light is turned off manually | Yes | No, the sunrise runs to the end |
+| Already-on detection (ramp from current brightness) | Yes | No, always starts at Startup Brightness |
+| Post-sunrise actions and Auto-Off | Yes | Yes |
+
+When several entities are selected, only the **first** one in the list is checked for these two features. Turning off a different light doesn't stop the sunrise, and the starting brightness is read from the first light only. If you group lights, list your main light first.
+
+### Using Other Devices With the Sunrise
+
+You don't need a dedicated setting to involve other devices. Add them to the **Pre-Sunrise Actions** or **Post-Sunrise Actions** inputs:
+
+| Goal | Where | Example action |
+|------|-------|----------------|
+| Play nature sounds while the light rises | Pre-Sunrise | Media player: play a playlist or radio station at low volume |
+| Open the blinds or shades | Pre-Sunrise (or Post-Sunrise to open at full brightness) | Cover: open the bedroom shades |
+| Warm up the room | Pre-Sunrise or Post-Sunrise | Climate: set temperature to your morning target |
+| Announce the weather or send a notification | Post-Sunrise | Notify or TTS: speak or send a message |
+| Stop the sounds once it's bright | Post-Sunrise | Media player: stop or turn off |
+
+Things to keep in mind:
+
+- Actions only run at the **start** (pre) and **end** (post) of the sunrise. They can't change gradually in step with the light, so a thermostat change is a single jump, not a slow ramp.
+- Post-sunrise actions are skipped if the light is turned off before the sunrise finishes. If you use a post-sunrise action to stop something (like music), it won't run in that case, so don't rely on it as your only way to stop it.
+- Auto-Off Timeout counts from when the post-sunrise actions finish, not from when the light reaches full brightness.
+
 ### How It Works
 
 The blueprint uses a smooth, non-linear curve to simulate a natural sunrise:
@@ -64,10 +95,10 @@ The blueprint uses a smooth, non-linear curve to simulate a natural sunrise:
 - **Brightness curve**: Uses a non-linear progression (power of 1.3) for natural-feeling transitions
 - **Smooth transitions**: Updates brightness at configurable intervals (default 30 seconds)
 - **Hardware aware**: Adjustable step interval and startup brightness for different light types
-- **Smart light monitoring**: Stops if the light is turned off during the simulation
+- **Smart light monitoring**: Stops if the light is turned off during the simulation (lights selected by entity only)
 - **Flexible scheduling**: Run daily or only on specific days of the week
 - **Presence gating**: Optionally skip the whole automation unless presence entities match a required state (any or all)
-- **Already-on handling**: If the light is already on, skips the forced startup snap and ramps brightness from its current level instead
+- **Already-on handling**: If the light is already on, skips the forced startup snap and ramps brightness from its current level instead (lights selected by entity only)
 - **Auto-off**: If set above 0, turns the light(s) off after the configured number of minutes once the sunrise (and post-sunrise actions) finish
 
 The algorithm starts at your configured startup brightness (or the light's current brightness if it's already on) and smoothly increases to maximum brightness over the duration, while simultaneously shifting color temperature from warm to cool.
@@ -108,6 +139,15 @@ The algorithm starts at your configured startup brightness (or the light's curre
 - Verify **Required Presence State** matches the entity's actual state string (e.g. "home" for a person, "on" for a binary_sensor)
 - With multiple entities, check **Presence Match Logic** - "All" requires every entity to match, "Any" only needs one
 - Leave **Presence Check Entities** empty to disable the presence check entirely
+
+**Turning the light off doesn't stop the sunrise, or an already-on light restarts from Startup Brightness:**
+- Both features need lights selected as individual **entities**. If you selected an area, device, or label, they're skipped
+- With several entities selected, only the first one in the list is checked
+- See [Choosing How to Select Lights](#choosing-how-to-select-lights)
+
+**Post-sunrise actions didn't run:**
+- They only run if the light is still on when the sunrise finishes. Turning the light off manually during the sunrise stops the whole automation, including these actions
+- Check the automation's trace in Home Assistant to see where it stopped
 
 **Light(s) don't turn off automatically:**
 - Check that **Auto-Off Timeout** is set above 0 (0 disables it)

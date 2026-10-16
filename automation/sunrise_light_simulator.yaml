@@ -8,7 +8,7 @@ blueprint:
   input:
     target_lights:
       name: Lights
-      description: Select lights by entity, area, device, or label for the sunrise simulation
+      description: Select lights by entity, area, device, or label for the sunrise simulation. Pick individual light entities to enable stop-on-manual-off and already-on detection, which only check the first entity listed.
       selector:
         target: {}
     start_time:
@@ -141,13 +141,13 @@ blueprint:
           unit_of_measurement: seconds
     pre_sunrise_actions:
       name: Pre-Sunrise Actions (Optional)
-      description: Actions to run before the sunrise simulation starts
+      description: Actions to run before the sunrise simulation starts. For example, start a nature sounds playlist, open the blinds, or send a notification.
       default: []
       selector:
         action: {}
     post_sunrise_actions:
       name: Post-Sunrise Actions (Optional)
-      description: Actions to run after the sunrise simulation completes
+      description: Actions to run once the sunrise reaches full brightness. For example, raise the thermostat, announce the weather, or stop a playlist. These are skipped if the light is turned off before the sunrise finishes.
       default: []
       selector:
         action: {}
